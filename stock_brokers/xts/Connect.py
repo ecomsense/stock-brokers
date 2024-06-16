@@ -12,7 +12,7 @@ import logging
 
 import requests
 from six.moves.urllib.parse import urljoin
-import XTException as ex
+from stock_brokers.xts import XTException as ex
 
 log = logging.getLogger(__name__)
 
