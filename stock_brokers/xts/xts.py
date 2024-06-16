@@ -34,6 +34,7 @@ class Xts(Broker):
                 self.token = resp["result"]["token"]
                 return True
             else:
+                print(f"no token in {resp =}")
                 return False
         except Exception as e:
             print(f"{e} while authenticating")
