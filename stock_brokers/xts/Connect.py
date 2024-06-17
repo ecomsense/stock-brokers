@@ -38,7 +38,7 @@ class XTSConnect(XTSCommon):
     """Get the configurations from config.ini"""
 
     disable_ssl = True
-    root = "https://jtrade.jainam.in"
+    root = "http://jtrade.jainam.in"
     broadcastMode = "Full"
     # Default root API endpoint. It's possible to
     # override this by passing the `root` parameter during initialisation.
