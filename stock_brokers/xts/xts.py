@@ -43,6 +43,7 @@ class Xts(Broker):
     @pre
     def order_place(self, **kwargs):
         try:
+            exch = kwargs["symbol"].split(":")
             productType = kwargs.pop("product", "NRML")
             orderType = kwargs.pop("order_type", "MARKET")
             orderSide = kwargs.pop("side")
@@ -53,6 +54,8 @@ class Xts(Broker):
             stopPrice = kwargs.pop("price", 0)
             orderUniqueIdentifier = kwargs.pop("tag", "no_tag")
             order_args = dict(
+                exchangeSegment=exch[0],
+                exchangeInstrumentID=exch[1],
                 productType=productType,
                 orderType=orderType,
                 orderSide=orderSide,
