@@ -43,6 +43,8 @@ class Xts(Broker):
     @pre
     def order_place(self, **kwargs):
         try:
+            resp = None
+            order_args = {}
             exch = kwargs["symbol"].split("|")
             productType = kwargs.pop("product", "NRML")
             orderType = kwargs.pop("order_type", "MARKET")
@@ -77,9 +79,9 @@ class Xts(Broker):
             ):
                 return resp["result"]["AppOrderID"]
             else:
-                print(f"resp for args {order_args}")
+                print(f"{resp} for args {order_args}")
         except Exception as e:
-            print(f"{e} in order_place")
+            print(f"{e} {resp} in {order_args}")
 
     @pre
     def order_modify(self, **kwargs):
