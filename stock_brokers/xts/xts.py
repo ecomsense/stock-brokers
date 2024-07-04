@@ -67,7 +67,7 @@ class Xts(Broker):
                 orderUniqueIdentifier=orderUniqueIdentifier,
                 clientID=self.user_id,
             )
-            order_args.update(kwargs)
+            # order_args.update(kwargs)
             resp = self.broker.place_order(**order_args)
             if (
                 resp is not None
