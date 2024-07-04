@@ -43,7 +43,7 @@ class Xts(Broker):
     @pre
     def order_place(self, **kwargs):
         try:
-            exch = kwargs["symbol"].split(":")
+            exch = kwargs["symbol"].split("|")
             productType = kwargs.pop("product", "NRML")
             orderType = kwargs.pop("order_type", "MARKET")
             orderSide = kwargs.pop("side")
