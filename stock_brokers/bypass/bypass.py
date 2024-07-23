@@ -72,13 +72,50 @@ class Bypass(Broker):
         else:
             return True
 
+    @staticmethod
+    def get_side(side):
+        if side[0].upper() == "B":
+            return "BUY"
+        else:
+            return "SELL"
+
+    @staticmethod
+    def get_order_type(order_type):
+        if order_type[0].upper() == "M":
+            return "MARKET"
+        elif order_type[0].upper() == "L":
+            return "LIMIT"
+        elif order_type.upper() == "SL":
+            return "SL"
+        else:
+            return "SL-M"
+
     @pre
     def order_place(self, **kwargs: List[Dict]):
         """
         Place an order
+
+        args:
+            exchange, symbol, side, quantity, product, order_type, 
+        optional:
+            price=None, validity=None, disclosed_quantity=None, trigger_price=None, 
+            squareoff=None, stoploss=None, trailing_stoploss=None, tag=None
         """
-        order_args = dict(variety="regular", validity="DAY")
-        order_args.update(kwargs)
+        order_args = dict(
+            exchange=kwargs["exchange"],
+            tradingsymbol=kwargs["symbol"],
+            transaction_type=Bypass.get_side(kwargs["side"]),
+            quantity=kwargs["quantity"],
+            product=kwargs["product"],
+            order_type=Bypass.get_order_type(kwargs["order_type"]),
+            variety=kwargs.get("variety", "regular"),
+        )
+        if kwargs.get("price", None):
+            order_args["price"] = kwargs["price"]
+        if kwargs.get("trigger_price", None):
+            order_args["trigger_price"] = kwargs["trigger_price"]
+
+        order_args["tag"] = kwargs.pop("tag", "stock_brokers")
         return self.kite.place_order(**order_args)
 
     @pre
@@ -88,11 +125,33 @@ class Bypass(Broker):
         Note
         ----
         All changes must be passed as keyword arguments
+        input: 
+            variety, order_id, 
+        optional:
+            parent_order_id=None, quantity=None, price=None, 
+            order_type=None, trigger_price=None, validity=None, 
+            disclosed_quantity=None)
         """
         order_id = kwargs.pop("order_id", None)
-        order_args = dict(variety="regular")
-        order_args.update(kwargs)
-        return self.kite.modify_order(order_id=order_id, **order_args)
+        if order_id is None:
+            raise ValueError("order_id is required")
+        order_args = dict(
+        variety=kwargs.get("variety", "regular"),
+        )
+        if kwargs.get("quantity", None):
+            order_args["quantity"] = kwargs["quantity"]
+        if kwargs.get("price", None):
+            order_args["price"] = kwargs["price"]
+        if kwargs.get("order_type", None):
+            order_args["order_type"] = Bypass.get_order_type(kwargs["order_type"])
+        if kwargs.get("trigger_price", None):
+            order_args["trigger_price"] = kwargs["trigger_price"]
+        if kwargs.get("validity", None):
+            order_args["validity"] = kwargs["validity"]
+        if kwargs.get("disclosed_quantity", None):
+            order_args["disclosed_quantity"] = kwargs["disclosed_quantity"]
+
+        return self.kite.modify_order(order_id=order_id, **kwargs)
 
     @pre
     def order_cancel(self, **kwargs):

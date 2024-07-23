@@ -48,7 +48,7 @@ class Xts(Broker):
             exch = kwargs["symbol"].split("|")
             productType = kwargs.pop("product", "NRML")
             orderType = kwargs.pop("order_type", "MARKET")
-            orderSide = "BUY" if kwargs["side"] == "B" else "SELL"
+            orderSide = "BUY" if kwargs["side"][0].upper() == "B" else "SELL"
             timeInForce = kwargs.pop("validity", "DAY")
             disclosedQuantity = kwargs.pop("disclosed_quantity", 0)
             orderQuantity = kwargs.pop("quantity", 0)
