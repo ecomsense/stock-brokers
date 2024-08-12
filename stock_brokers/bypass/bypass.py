@@ -1,12 +1,11 @@
 import os
-import time
-import traceback
 from typing import Dict, List
 
 import pyotp
 import requests
 from kiteext.kiteext import KiteExt
 
+from helper import Helper
 from stock_brokers.base import Broker, post, pre
 
 
@@ -74,24 +73,6 @@ class Bypass(Broker):
         else:
             return True
 
-    @staticmethod
-    def get_side(side):
-        if side[0].upper() == "B":
-            return "BUY"
-        else:
-            return "SELL"
-
-    @staticmethod
-    def get_order_type(order_type):
-        if order_type[0].upper() == "M":
-            return "MARKET"
-        elif order_type[0].upper() == "L":
-            return "LIMIT"
-        elif order_type.upper() == "SL":
-            return "SL"
-        else:
-            return "SL-M"
-
     @pre
     def order_place(self, **kwargs: List[Dict]):
         """
@@ -103,14 +84,13 @@ class Bypass(Broker):
             price=None, validity=None, disclosed_quantity=None, trigger_price=None,
             squareoff=None, stoploss=None, trailing_stoploss=None, tag=None
         """
-        print(kwargs)
         order_args = dict(
             exchange=kwargs["exchange"],
-            tradingsymbol=kwargs["symbol"],
-            transaction_type=Bypass.get_side(kwargs["side"]),
+            tradingsymbol=kwargs["trandingsymbol"],
+            transaction_type=Helper.get_side(kwargs["transaction_type"]),
             quantity=kwargs["quantity"],
             product=kwargs["product"],
-            order_type=Bypass.get_order_type(kwargs["order_type"]),
+            order_type=Helper.get_order_type(kwargs["order_type"]),
             variety=kwargs.get("variety", "regular"),
         )
         if kwargs.get("price", None):
@@ -146,7 +126,7 @@ class Bypass(Broker):
         if kwargs.get("price", None):
             order_args["price"] = kwargs["price"]
         if kwargs.get("order_type", None):
-            order_args["order_type"] = Bypass.get_order_type(kwargs["order_type"])
+            order_args["order_type"] = Helper.get_order_type(kwargs["order_type"])
         if kwargs.get("trigger_price", None):
             order_args["trigger_price"] = kwargs["trigger_price"]
         if kwargs.get("validity", None):

@@ -1,11 +1,13 @@
-from ..base import Broker, pre, post
-from kiteconnect import KiteConnect
-from typing import List, Dict
-import pyotp
-from traceback import print_exc
 import sys
-import requests
+from typing import Dict, List
 
+import pyotp
+import requests
+from kiteconnect import KiteConnect
+
+from helper import Helper
+
+from ..base import Broker, post, pre
 
 LOGINURL = "https://kite.zerodha.com/api/login"
 TWOFAURL = "https://kite.zerodha.com/api/twofa"
@@ -120,18 +122,18 @@ class Zerodha(Broker):
         Place an order
 
         args:
-            exchange, symbol, side, quantity, product, order_type, 
+            exchange, symbol, side, quantity, product, order_type,
         optional:
-            price=None, validity=None, disclosed_quantity=None, trigger_price=None, 
+            price=None, validity=None, disclosed_quantity=None, trigger_price=None,
             squareoff=None, stoploss=None, trailing_stoploss=None, tag=None
         """
         order_args = dict(
             exchange=kwargs["exchange"],
-            tradingsymbol=kwargs["symbol"],
-            transaction_type=Bypass.get_side(kwargs["side"]),
+            tradingsymbol=kwargs["tradingsymbol"],
+            transaction_type=Helper.get_side(kwargs["transaction_type"]),
             quantity=kwargs["quantity"],
             product=kwargs["product"],
-            order_type=Bypass.get_order_type(kwargs["order_type"]),
+            order_type=Helper.get_order_type(kwargs["order_type"]),
             variety=kwargs.get("variety", "regular"),
         )
         if kwargs.get("price", None):
@@ -149,18 +151,18 @@ class Zerodha(Broker):
         Note
         ----
         All changes must be passed as keyword arguments
-        input: 
-            variety, order_id, 
+        input:
+            variety, order_id,
         optional:
-            parent_order_id=None, quantity=None, price=None, 
-            order_type=None, trigger_price=None, validity=None, 
+            parent_order_id=None, quantity=None, price=None,
+            order_type=None, trigger_price=None, validity=None,
             disclosed_quantity=None)
         """
         order_id = kwargs.pop("order_id", None)
         if order_id is None:
             raise ValueError("order_id is required")
         order_args = dict(
-        variety=kwargs.get("variety", "regular"),
+            variety=kwargs.get("variety", "regular"),
         )
         if kwargs.get("quantity", None):
             order_args["quantity"] = kwargs["quantity"]
