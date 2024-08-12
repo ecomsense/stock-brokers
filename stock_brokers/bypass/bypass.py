@@ -39,11 +39,10 @@ class Bypass(Broker):
             self.kite.set_headers(self.enctoken, self.userid)
         except Exception as err:
             print(f"{err} while authentiating")
-            self.remove_token()
+            self.remove_token
             return False
         else:
             return True
-        return False
 
     def get_enctoken(self) -> bool:
         try:
@@ -86,7 +85,7 @@ class Bypass(Broker):
         """
         order_args = dict(
             exchange=kwargs["exchange"],
-            tradingsymbol=kwargs["trandingsymbol"],
+            tradingsymbol=kwargs["tradingsymbol"],
             transaction_type=Helper.get_side(kwargs["transaction_type"]),
             quantity=kwargs["quantity"],
             product=kwargs["product"],
