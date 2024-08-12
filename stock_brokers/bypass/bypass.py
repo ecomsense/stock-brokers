@@ -1,11 +1,13 @@
-from stock_brokers.base import Broker, pre, post
-from kiteext.kiteext import KiteExt
-from typing import List, Dict
-import pyotp
-import traceback
-import time
-import requests
 import os
+import time
+import traceback
+from typing import Dict, List
+
+import pyotp
+import requests
+from kiteext.kiteext import KiteExt
+
+from stock_brokers.base import Broker, post, pre
 
 
 class Bypass(Broker):
@@ -96,11 +98,12 @@ class Bypass(Broker):
         Place an order
 
         args:
-            exchange, symbol, side, quantity, product, order_type, 
+            exchange, symbol, side, quantity, product, order_type,
         optional:
-            price=None, validity=None, disclosed_quantity=None, trigger_price=None, 
+            price=None, validity=None, disclosed_quantity=None, trigger_price=None,
             squareoff=None, stoploss=None, trailing_stoploss=None, tag=None
         """
+        print(kwargs)
         order_args = dict(
             exchange=kwargs["exchange"],
             tradingsymbol=kwargs["symbol"],
@@ -125,18 +128,18 @@ class Bypass(Broker):
         Note
         ----
         All changes must be passed as keyword arguments
-        input: 
-            variety, order_id, 
+        input:
+            variety, order_id,
         optional:
-            parent_order_id=None, quantity=None, price=None, 
-            order_type=None, trigger_price=None, validity=None, 
+            parent_order_id=None, quantity=None, price=None,
+            order_type=None, trigger_price=None, validity=None,
             disclosed_quantity=None)
         """
         order_id = kwargs.pop("order_id", None)
         if order_id is None:
             raise ValueError("order_id is required")
         order_args = dict(
-        variety=kwargs.get("variety", "regular"),
+            variety=kwargs.get("variety", "regular"),
         )
         if kwargs.get("quantity", None):
             order_args["quantity"] = kwargs["quantity"]
