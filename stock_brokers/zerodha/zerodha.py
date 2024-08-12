@@ -5,9 +5,8 @@ import pyotp
 import requests
 from kiteconnect import KiteConnect
 
-from helper import Helper
-
-from ..base import Broker, post, pre
+from stock_brokers.base import Broker, post, pre
+from stock_brokers.helper import Helper
 
 LOGINURL = "https://kite.zerodha.com/api/login"
 TWOFAURL = "https://kite.zerodha.com/api/twofa"

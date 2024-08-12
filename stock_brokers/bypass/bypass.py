@@ -5,8 +5,8 @@ import pyotp
 import requests
 from kiteext.kiteext import KiteExt
 
-from helper import Helper
 from stock_brokers.base import Broker, post, pre
+from stock_brokers.helper import Helper
 
 
 class Bypass(Broker):
