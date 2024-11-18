@@ -1,9 +1,9 @@
 order_place:
-  buy_or_sell : side
+  buy_or_sell: side
   tradingsymbol: symbol
   price_type: order_type
   retention: validity
-  discloseqty : disclosed_quantity
+  discloseqty: disclosed_quantity
   product_type: product
   remarks: tag
 order_modify:
@@ -34,6 +34,7 @@ orders:
   exchordid: exchange_order_id
   dscqty: disclosed_quantity
   norentm: broker_timestamp
+  prd: product
 trades:
   norenordno: order_id
   exch: exchange
@@ -41,4 +42,3 @@ trades:
   flqty: filled_quantity
   exchordid: exchange_order_id
   flprc: price
-
