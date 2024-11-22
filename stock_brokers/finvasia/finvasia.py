@@ -4,6 +4,7 @@ from typing import List, Dict, Union, Set
 import pendulum
 import pyotp
 import logging
+from traceback import print_exc
 
 
 class Finvasia(Broker):
@@ -235,10 +236,14 @@ class Finvasia(Broker):
         """
         Modify an existing order
         """
-        order_type = kwargs.pop("price_type", "MARKET")
-        if order_type:
-            kwargs["price_type"] = self.get_order_type(order_type)
-        return self.finvasia.modify_order(**kwargs)
+        try:
+            order_type = kwargs.pop("price_type", "MARKET")
+            if order_type:
+                kwargs["price_type"] = self.get_order_type(order_type)
+            return self.finvasia.modify_order(**kwargs)
+        except Exception as e:
+            print(f"{e} order modify")
+            print_exc()
 
     @property
     def margins(self):
