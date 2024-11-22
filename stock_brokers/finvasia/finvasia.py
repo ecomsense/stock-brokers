@@ -237,12 +237,12 @@ class Finvasia(Broker):
         Modify an existing order
         """
         try:
-            order_type = kwargs.pop("price_type", "MARKET")
+            order_type = kwargs.pop("new_pricetype", "MARKET")
             if order_type:
-                kwargs["price_type"] = self.get_order_type(order_type)
+                kwargs["new_pricetype"] = self.get_order_type(order_type)
             return self.finvasia.modify_order(**kwargs)
         except Exception as e:
-            print(f"{e} order modify")
+            print(f"{e} order modify with params {kwargs}")
             print_exc()
 
     @property
