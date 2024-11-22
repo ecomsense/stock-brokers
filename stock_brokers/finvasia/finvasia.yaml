@@ -7,12 +7,12 @@ order_place:
   product_type: product
   remarks: tag
 order_modify:
+  symbol: tradingsymbol
   quantity: newquantity
+  disclosed_quantity: discloseqty
   price: newprice
   trigger_price: newtrigger_price
-  symbol: tradingsymbol
   validity: retention
-  disclosed_quantity: discloseqty
 positions:
   tsym: symbol
   netqty: quantity
