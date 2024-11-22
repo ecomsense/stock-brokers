@@ -8,11 +8,11 @@ order_place:
   remarks: tag
 order_modify:
   symbol: tradingsymbol
+  order_id: orderno
   quantity: newquantity
-  disclosed_quantity: discloseqty
-  price: newprice
   trigger_price: newtrigger_price
-  validity: retention
+  price: newprice
+  price_type: newprice_type
 positions:
   tsym: symbol
   netqty: quantity
@@ -35,6 +35,7 @@ orders:
   dscqty: disclosed_quantity
   norentm: broker_timestamp
   prd: product
+  prctyp: price_type
 trades:
   norenordno: order_id
   exch: exchange
