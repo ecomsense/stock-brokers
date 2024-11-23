@@ -37,9 +37,21 @@ orders:
   prd: product
   prctyp: price_type
 trades:
-  norenordno: order_id
   exch: exchange
-  fltm: filled_timestamp
-  flqty: filled_quantity
+  tsym: symbol
+  norenordno: order_id
+  qty: quantity
+  trantype: side
+  prd: product
+  prctyp: price_type
+  fillshares: fill_shares
+  avgprc: average_price
   exchordid: exchange_order_id
-  flprc: price
+  remarks: tag
+  ret: validity
+  pp: price_precision
+  ti: tick_size
+  fltm: fill_timestamp
+  flqty: fill_quantity
+  flprc: fill_price
+  ordersource: source
