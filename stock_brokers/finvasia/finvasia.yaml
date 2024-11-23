@@ -55,3 +55,4 @@ trades:
   flqty: fill_quantity
   flprc: fill_price
   ordersource: source
+  norentm: broker_timestamp

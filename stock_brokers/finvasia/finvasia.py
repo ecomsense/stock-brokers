@@ -84,7 +84,7 @@ class Finvasia(Broker):
         order_list = []
         orderbook = self.finvasia.get_order_book()
 
-        if not orderbook or len(orderbook == 0):
+        if not orderbook or len(orderbook) == 0:
             return [{}]
 
         float_cols = ["avgprc", "prc", "rprc", "trgprc"]
@@ -150,23 +150,28 @@ class Finvasia(Broker):
     @property
     @post
     def trades(self) -> List[Dict]:
-        tradebook = self.finvasia.get_trade_book()
-        if not tradebook or len(tradebook) == 0:
-            return tradebook
+        try:
+            trade_list = []
+            tradebook = self.finvasia.get_trade_book()
+            if not tradebook or len(tradebook) == 0:
+                return [{}]
 
-        trade_list = []
-        int_cols = ["flqty", "qty", "fillshares"]
-        float_cols = ["prc", "flprc"]
-        for trade in tradebook:
-            try:
-                for int_col in int_cols:
-                    trade[int_col] = int(trade.get(int_col, 0))
-                for float_col in float_cols:
-                    trade[float_col] = float(trade.get(float_col, 0))
-            except Exception as e:
-                logging.error(e)
-            trade_list.append(trade)
-        return trade_list
+            int_cols = ["flqty", "qty", "fillshares"]
+            float_cols = ["prc", "flprc"]
+            for trade in tradebook:
+                try:
+                    for int_col in int_cols:
+                        trade[int_col] = int(trade.get(int_col, 0))
+                    for float_col in float_cols:
+                        trade[float_col] = float(trade.get(float_col, 0))
+                except Exception as e:
+                    print(f"{e} while iter stockbroker trades")
+                trade_list.append(trade)
+        except Exception as e:
+            print(f"{e} in stockbroker trades")
+            print_exc()
+        finally:
+            return trade_list
 
     def get_order_type(self, order_type: str) -> str:
         """
