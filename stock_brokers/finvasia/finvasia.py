@@ -83,30 +83,29 @@ class Finvasia(Broker):
     def orders(self) -> List[Dict]:
         order_list = []
         orderbook = self.finvasia.get_order_book()
-        if orderbook:
-            float_cols = ["avgprc", "prc", "rprc", "trgprc"]
-            int_cols = ["fillshares", "qty"]
-            for order in orderbook:
-                for int_col in int_cols:
-                    order[int_col] = int(order.get(int_col, 0))
-                for float_col in float_cols:
-                    order[float_col] = float(order.get(float_col, 0))
-                # pendulum current datetime
-                now = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
-                ts = order.get("exch_tm", now)
-                # Timestamp converted to str to facilitate loading into pandas dataframe
-                order["exchange_timestamp"] = str(
-                    pendulum.from_format(
-                        ts, fmt="DD-MM-YYYY HH:mm:ss", tz="Asia/Kolkata"
-                    )
-                )
-                ts2 = order.get("norentm", now)
-                order["broker_timestamp"] = str(
-                    pendulum.from_format(
-                        ts2, fmt="HH:mm:ss DD-MM-YYYY", tz="Asia/Kolkata"
-                    )
-                )
-                order_list.append(order)
+
+        if not orderbook or len(orderbook == 0):
+            return [{}]
+
+        float_cols = ["avgprc", "prc", "rprc", "trgprc"]
+        int_cols = ["fillshares", "qty"]
+        for order in orderbook:
+            for int_col in int_cols:
+                order[int_col] = int(order.get(int_col, 0))
+            for float_col in float_cols:
+                order[float_col] = float(order.get(float_col, 0))
+            # pendulum current datetime
+            now = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
+            ts = order.get("exch_tm", now)
+            # Timestamp converted to str to facilitate loading into pandas dataframe
+            order["exchange_timestamp"] = str(
+                pendulum.from_format(ts, fmt="DD-MM-YYYY HH:mm:ss", tz="Asia/Kolkata")
+            )
+            ts2 = order.get("norentm", now)
+            order["broker_timestamp"] = str(
+                pendulum.from_format(ts2, fmt="HH:mm:ss DD-MM-YYYY", tz="Asia/Kolkata")
+            )
+            order_list.append(order)
         return order_list
 
     @property
@@ -152,7 +151,7 @@ class Finvasia(Broker):
     @post
     def trades(self) -> List[Dict]:
         tradebook = self.finvasia.get_trade_book()
-        if len(tradebook) == 0:
+        if not tradebook or len(tradebook) == 0:
             return tradebook
 
         trade_list = []
