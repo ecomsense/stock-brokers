@@ -1,9 +1,13 @@
-from omspy.brokers.api_helper import ShoonyaApiPy
-from omspy.base import Broker, pre, post
-from typing import List, Dict, Union, Set
+from stock_brokers.finvasia.api_helper import ShoonyaApiPy
+from stock_brokers.finvasia.api_helper import (
+    convert_symbol,
+    get_price_type,
+    get_product,
+)
+from stock_brokers.base import Broker, pre, post
+from typing import List, Dict, Union
 import pendulum
 import pyotp
-import logging
 from traceback import print_exc
 
 
@@ -42,41 +46,26 @@ class Finvasia(Broker):
             self.finvasia = ShoonyaApiPy()
         super(Finvasia, self).__init__()
 
-    @property
-    def attribs_to_copy_modify(self) -> Set:
-        return {"symbol", "exchange"}
-
-    def login(self) -> Union[Dict, None]:
-        if len(self._pin) > 15:
-            twoFA = self._pin if len(self._pin) == 4 else pyotp.TOTP(self._pin).now()
-        else:
-            twoFA = self._pin
-        return self.finvasia.login(
-            userid=self._user_id,
-            password=self._password,
-            twoFA=twoFA,
-            vendor_code=self._vendor_code,
-            api_secret=self._app_key,
-            imei=self._imei,
-        )
-
     def authenticate(self) -> Union[Dict, None]:
-        """
-        Authenticate the user
-        """
-        return self.login()
-
-    def _convert_symbol(self, symbol: str, exchange: str = "NSE") -> str:
-        """
-        Convert raw symbol to finvasia
-        """
-        if exchange == "NSE":
-            if symbol.endswith("-EQ") or symbol.endswith("-eq"):
-                return symbol
+        try:
+            if len(self._pin) > 15:
+                twoFA = (
+                    self._pin if len(self._pin) == 4 else pyotp.TOTP(self._pin).now()
+                )
             else:
-                return f"{symbol}-EQ"
-        else:
-            return symbol
+                twoFA = self._pin
+            return self.finvasia.login(
+                userid=self._user_id,
+                password=self._password,
+                twoFA=twoFA,
+                vendor_code=self._vendor_code,
+                api_secret=self._app_key,
+                imei=self._imei,
+            )
+        except Exception as e:
+            print(f"{e} in login")
+            print_exc()
+            return None
 
     @property
     @post
@@ -143,84 +132,57 @@ class Finvasia(Broker):
                 for float_col in float_cols:
                     position[float_col] = float(position.get(float_col, 0))
             except Exception as e:
-                logging.error(e)
+                print(f"{e} while iter stockbroker trades")
+                print_exc()
             position_list.append(position)
         return position_list
 
     @property
     @post
     def trades(self) -> List[Dict]:
-        try:
-            trade_list = []
-            tradebook = self.finvasia.get_trade_book()
-            if not tradebook or len(tradebook) == 0:
-                return [{}]
+        trade_list = []
+        tradebook = self.finvasia.get_trade_book()
+        if not tradebook or len(tradebook) == 0:
+            return [{}]
 
-            int_cols = ["flqty", "qty", "fillshares"]
-            float_cols = ["prc", "flprc"]
-            for trade in tradebook:
-                try:
-                    for int_col in int_cols:
-                        trade[int_col] = int(trade.get(int_col, 0))
-                    for float_col in float_cols:
-                        trade[float_col] = float(trade.get(float_col, 0))
-                except Exception as e:
-                    print(f"{e} while iter stockbroker trades")
-                trade_list.append(trade)
-        except Exception as e:
-            print(f"{e} in stockbroker trades")
-            print_exc()
-        finally:
-            return trade_list
-
-    def get_order_type(self, order_type: str) -> str:
-        """
-        Convert a generic order type to this specific
-        broker's order type string
-        returns MKT if the order_type is not matching
-        """
-        order_types = dict(
-            LIMIT="LMT", MARKET="MKT", SL="SL-LMT", SLM="SL-MKT", SLL="SL-LMT"
-        )
-        order_types["SL-M"] = "SL-MKT"
-        order_types["SL-L"] = "SL-LMT"
-        return order_types.get(order_type.upper(), order_type)
+        int_cols = ["flqty", "qty", "fillshares"]
+        float_cols = ["prc", "flprc"]
+        for trade in tradebook:
+            try:
+                for int_col in int_cols:
+                    trade[int_col] = int(trade.get(int_col, 0))
+                for float_col in float_cols:
+                    trade[float_col] = float(trade.get(float_col, 0))
+                now = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
+                ts = trade.get("norentm", now)
+                trade["broker_timestamp"] = str(
+                    pendulum.from_format(
+                        ts, fmt="HH:mm:ss DD-MM-YYYY", tz="Asia/Kolkata"
+                    )
+                )
+            except Exception as e:
+                print(f"{e} while iter stockbroker trades")
+                print_exc()
+            trade_list.append(trade)
+        return trade_list
 
     @pre
     def order_place(self, **kwargs) -> Union[str, None]:
         try:
-            buy_or_sell = kwargs.pop("side")
-            product_type = kwargs.pop("product", "I")
-            exchange = kwargs.pop("exchange")
-            discloseqty = kwargs.pop("disclosed_quantity", 0)
-            price_type = kwargs.pop("order_type", "MARKET")
-            if price_type:
-                price_type = self.get_order_type(price_type)
-            tradingsymbol = kwargs.pop("symbol")
-            if tradingsymbol and exchange:
-                tradingsymbol = tradingsymbol.upper()
-                tradingsymbol = self._convert_symbol(tradingsymbol, exchange=exchange)
-            price = kwargs.pop("price", None)
-            if price and price < 0:
-                price = 0.05
-            trigger_price = kwargs.pop("trigger_price", None)
-            if trigger_price and trigger_price < 0:
-                trigger_price = 0.05
-            retention = kwargs.pop("validity", "DAY")
-            remarks = kwargs.pop("tag", "no_remarks")
             order_args = dict(
-                buy_or_sell=buy_or_sell,
-                product_type=product_type,
-                exchange=exchange,
-                tradingsymbol=tradingsymbol,
-                discloseqty=discloseqty,
-                price_type=price_type,
-                price=price,
-                trigger_price=trigger_price,
-                retention=retention,
-                remarks=remarks,
+                side=kwargs.pop("side")[0].upper(),
+                product=get_product(kwargs.pop("product", "I")),
+                symbol=convert_symbol(kwargs.pop("symbol", None), kwargs["exchange"]),
+                disclosed_quantity=kwargs.pop("disclosed_quantity", kwargs["quantity"]),
+                price_type=get_price_type(kwargs.pop("price_type")),
+                price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
+                trigger_price=(lambda x: x if x >= 0 else 0.05)(
+                    kwargs.pop("trigger_price", 0)
+                ),
+                validity=kwargs.pop("validity", "DAY"),
+                tag=kwargs.pop("tag", "stock_brokers"),
             )
-            # we have only quantity in kwargs now
+            # kwargs now contain quantity and exchange
             order_args.update(kwargs)
             response = self.finvasia.place_order(**order_args)
             if isinstance(response, dict) and response.get("norenordno") is not None:
@@ -243,7 +205,7 @@ class Finvasia(Broker):
         try:
             order_type = kwargs.pop("newprice_type", "MARKET")
             if order_type:
-                kwargs["newprice_type"] = self.get_order_type(order_type)
+                kwargs["newprice_type"] = get_price_type(order_type)
             return self.finvasia.modify_order(**kwargs)
         except Exception as e:
             print(f"{e} order modify with params {kwargs}")
