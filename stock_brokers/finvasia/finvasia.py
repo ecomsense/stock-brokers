@@ -188,7 +188,8 @@ class Finvasia(Broker):
             if isinstance(response, dict) and response.get("norenordno") is not None:
                 return response["norenordno"]
         except Exception as err:
-            print(err)
+            print(f"{err} in stock_brokers order_place with {kwargs}")
+            print_exc()
 
     @post
     def order_cancel(self, order_id: str) -> Union[Dict, None]:
