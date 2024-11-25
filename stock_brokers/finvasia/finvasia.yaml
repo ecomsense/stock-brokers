@@ -1,11 +1,11 @@
 order_place:
-  buy_or_sell: side
-  tradingsymbol: symbol
-  price_type: order_type
-  retention: validity
-  discloseqty: disclosed_quantity
-  product_type: product
-  remarks: tag
+  side: buy_or_sell
+  symbol: tradingsymbol
+  order_type: price_type
+  validity: retention
+  disclosed_quantity: discloseqty
+  product: product_type
+  tag: remarks
 order_modify:
   symbol: tradingsymbol
   order_id: orderno
