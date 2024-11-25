@@ -170,17 +170,19 @@ class Finvasia(Broker):
     def order_place(self, **kwargs) -> Union[str, None]:
         try:
             order_args = dict(
-                side=kwargs.pop("side")[0].upper(),
-                product=get_product(kwargs.pop("product", "I")),
-                symbol=convert_symbol(kwargs.pop("symbol", None), kwargs["exchange"]),
-                disclosed_quantity=kwargs.pop("disclosed_quantity", kwargs["quantity"]),
+                buy_or_sell=kwargs.pop("buy_or_sell")[0].upper(),
+                product_type=get_product(kwargs.pop("product_type", "I")),
+                tradingsymbol=convert_symbol(
+                    kwargs.pop("tradingsymbol", None), kwargs["exchange"]
+                ),
+                discloseqty=kwargs.pop("discloseqty", kwargs["quantity"]),
                 price_type=get_price_type(kwargs.pop("price_type")),
                 price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
                 trigger_price=(lambda x: x if x >= 0 else 0.05)(
                     kwargs.pop("trigger_price", 0)
                 ),
-                validity=kwargs.pop("validity", "DAY"),
-                tag=kwargs.pop("tag", "stock_brokers"),
+                retention=kwargs.pop("retention", "DAY"),
+                remarks=kwargs.pop("remarks", "stock_brokers"),
             )
             # kwargs now contain quantity and exchange
             order_args.update(kwargs)
