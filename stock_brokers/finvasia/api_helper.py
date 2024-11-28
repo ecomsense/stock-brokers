@@ -4,8 +4,22 @@ import time
 import concurrent.futures
 import pendulum
 from traceback import print_exc
+from typing import List, Dict
 
 api = None
+
+
+def filter_dictionary_by_keys(elephant: Dict, keys: List) -> Dict:
+    """
+    generic function to filter any dict
+    """
+    if not any(elephant):
+        return elephant
+
+    filtered = {}
+    for item in keys:
+        filtered[item] = elephant.get(item, None)
+    return filtered
 
 
 def get_order_type(order_type: str) -> str:
@@ -76,7 +90,7 @@ def post_order_hook(*orderbook):
             "price_type",
         ]
         # Extract only the key-value pairs where the key is in the predefined keys list
-        orderbook = [{k: order[k] for k in keys} for order in orderbook]
+        orderbook = [filter_dictionary_by_keys(order, keys) for order in orderbook]
         float_cols = ["average_price", "price", "trigger_price"]
         int_cols = ["filled_quantity", "quantity"]
         order_list = []
