@@ -35,7 +35,7 @@ orders:
   dscqty: disclosed_quantity
   norentm: broker_timestamp
   prd: product
-  prctyp: price_type
+  prctyp: order_type
   exch_tm: exchange_timestamp
 trades:
   exch: exchange

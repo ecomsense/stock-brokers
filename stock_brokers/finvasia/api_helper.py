@@ -98,7 +98,7 @@ def post_order_hook(*orderbook):
             "exchange_timestamp",
             "status",
             "product",
-            "price_type",
+            "order_type",
         ]
         # Extract only the key-value pairs where the key is in the predefined keys list
         orderbook = [filter_dictionary_by_keys(order, keys) for order in orderbook]
