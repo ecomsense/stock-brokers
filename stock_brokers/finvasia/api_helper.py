@@ -3,6 +3,7 @@ from stock_brokers.finvasia.NorenApi import NorenApi
 import time
 import concurrent.futures
 import pendulum
+from traceback import print_exc
 
 api = None
 
@@ -86,7 +87,7 @@ def post_order_hook(*orderbook):
                 )(order.pop(int_col))
             for float_col in float_cols:
                 order[float_col] = (
-                    lambda x: int(x) if isinstance(x, str) and x.isdigit() else 0
+                    lambda x: float(x) if isinstance(x, str) and x.isdigit() else 0
                 )(order.pop(float_col))
             # pendulum current datetime
             now = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
@@ -102,7 +103,8 @@ def post_order_hook(*orderbook):
             order_list.append(order)
         return order_list
     except Exception as e:
-        print(f"{e} while processing orderbook")
+        print(f"{e} while processing stock_brokers orderbook")
+        print_exc()
 
 
 def convert_symbol(symbol: str, exchange: str = "NSE") -> str:
