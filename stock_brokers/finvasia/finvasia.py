@@ -66,9 +66,9 @@ class Finvasia(Broker):
     @post
     def orders(self) -> List[Dict]:
         orderbook = self.broker.get_order_book()
-
         if not orderbook or len(orderbook) == 0:
             return [{}]
+        print(orderbook[0].keys())
         return orderbook
 
     @property
