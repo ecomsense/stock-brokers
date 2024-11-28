@@ -110,7 +110,8 @@ def post_order_hook(*orderbook):
             order["exchange_timestamp"] = str(
                 pendulum.from_format(ts, fmt="DD-MM-YYYY HH:mm:ss", tz="Asia/Kolkata")
             )
-            ts2 = order.get("exchange_timestamp", now)
+            ts2 = order.get("broker_timestamp", now)
+            print(order["broker_timestamp"])
             order["broker_timestamp"] = str(
                 pendulum.from_format(ts2, fmt="HH:mm:ss DD-MM-YYYY", tz="Asia/Kolkata")
             )
