@@ -85,7 +85,9 @@ def post_order_hook(*orderbook):
                     lambda x: int(x) if isinstance(x, str) and x.isdigit() else 0
                 )(order.pop(int_col))
             for float_col in float_cols:
-                order[float_col] = float(order.get(float_col, 0))
+                order[float_col] = (
+                    lambda x: int(x) if isinstance(x, str) and x.isdigit() else 0
+                )(order.pop(float_col))
             # pendulum current datetime
             now = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
             ts = order.get("exchange_timestamp", now)
