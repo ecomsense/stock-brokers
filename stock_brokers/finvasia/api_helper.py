@@ -1,4 +1,3 @@
-from typing import Dict
 from stock_brokers.finvasia.NorenApi import NorenApi
 import time
 import concurrent.futures
@@ -7,6 +6,17 @@ from traceback import print_exc
 from typing import List, Dict
 
 api = None
+
+
+def convert_time_string(dct, key, fmt):
+    # pendulum current datetime
+    now = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
+    if dct[key] is None:
+        ts = now
+    else:
+        ts = dct.pop(key)
+    dct[key] = str(pendulum.from_format(ts, fmt=fmt, tz="Asia/Kolkata"))
+    return dct
 
 
 def filter_dictionary_by_keys(elephant: Dict, keys: List) -> Dict:
@@ -85,6 +95,7 @@ def post_order_hook(*orderbook):
             "exchange_order_id",
             "disclosed_quantity",
             "broker_timestamp",
+            "exchange_timestamp",
             "status",
             "product",
             "price_type",
@@ -103,17 +114,12 @@ def post_order_hook(*orderbook):
                 order[float_col] = (
                     lambda x: float(x) if isinstance(x, str) and x.isdigit() else 0
                 )(order.pop(float_col))
-            # pendulum current datetime
-            now = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
-            ts = order.get("exchange_timestamp", now)
-            # Timestamp converted to str to facilitate loading into pandas dataframe
-            order["exchange_timestamp"] = str(
-                pendulum.from_format(ts, fmt="DD-MM-YYYY HH:mm:ss", tz="Asia/Kolkata")
+
+            order = convert_time_string(
+                order, "exchange_timestamp", "DD-MM-YYYY HH:mm:ss"
             )
-            ts2 = order.get("broker_timestamp", now)
-            print(order["broker_timestamp"])
-            order["broker_timestamp"] = str(
-                pendulum.from_format(ts2, fmt="HH:mm:ss DD-MM-YYYY", tz="Asia/Kolkata")
+            order = convert_time_string(
+                order, "broker_timestamp", "HH:mm:ss DD-MM-YYYY"
             )
             order_list.append(order)
         return order_list
