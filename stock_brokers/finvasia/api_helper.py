@@ -81,7 +81,9 @@ def post_order_hook(*orderbook):
         order_list = []
         for order in orderbook:
             for int_col in int_cols:
-                order[int_col] = int(order.get(int_col, 0))
+                order[int_col] = (
+                    lambda x: int(x) if isinstance(x, str) and x.isdigit() else 0
+                )(order.pop(int_col))
             for float_col in float_cols:
                 order[float_col] = float(order.get(float_col, 0))
             # pendulum current datetime
