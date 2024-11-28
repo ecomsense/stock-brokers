@@ -12,7 +12,7 @@ order_modify:
   quantity: newquantity
   trigger_price: newtrigger_price
   price: newprice
-  price_type: newprice_type
+  order_type: newprice_type
 positions:
   tsym: symbol
   netqty: quantity
@@ -36,6 +36,7 @@ orders:
   norentm: broker_timestamp
   prd: product
   prctyp: price_type
+  exch_tm: exchange_timestamp
 trades:
   exch: exchange
   tsym: symbol

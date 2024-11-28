@@ -1,3 +1,4 @@
+from typing import Dict
 from stock_brokers.finvasia.NorenApi import NorenApi
 import time
 import concurrent.futures
@@ -5,7 +6,7 @@ import concurrent.futures
 api = None
 
 
-def get_price_type(order_type: str) -> str:
+def get_order_type(order_type: str) -> str:
     order_types = {
         "LIMIT": "LMT",
         "MARKET": "MKT",
@@ -21,6 +22,35 @@ def get_price_type(order_type: str) -> str:
 def get_product(product_type: str) -> str:
     product_types = {"MIS": "I", "CNC": "C", "NRML": "M", "BRACKET": "B", "COVER": "H"}
     return product_types.get(product_type.upper(), product_type)
+
+
+def make_order_modify_args(**kwargs) -> Dict:
+    order_args = dict(
+        symbol=convert_symbol(kwargs.pop("symbol", None), kwargs["exchange"]),
+        order_type=get_order_type(kwargs.pop("order_type")),
+        price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
+        trigger_price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("trigger_price", 0)),
+        quantity=kwargs.pop("quantity"),
+    )
+    order_args.update(kwargs)
+    return order_args
+
+
+def make_order_place_args(**kwargs) -> Dict:
+    order_args = dict(
+        side=kwargs.pop("side")[0].upper(),
+        product=get_product(kwargs.pop("product", "I")),
+        symbol=convert_symbol(kwargs.pop("symbol", None), kwargs["exchange"]),
+        disclosed_quantity=kwargs.pop("disclosed_quantity", kwargs["quantity"]),
+        order_type=get_order_type(kwargs.pop("order_type")),
+        price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
+        trigger_price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("trigger_price", 0)),
+        validity=kwargs.pop("validity", "DAY"),
+        tag=kwargs.pop("tag", "stock_brokers"),
+    )
+    # kwargs now contain quantity and exchange
+    order_args.update(kwargs)
+    return order_args
 
 
 def convert_symbol(symbol: str, exchange: str = "NSE") -> str:
