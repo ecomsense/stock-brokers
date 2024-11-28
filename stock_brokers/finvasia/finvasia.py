@@ -65,11 +65,15 @@ class Finvasia(Broker):
     @property
     @post
     def orders(self) -> List[Dict]:
-        orderbook = self.broker.get_order_book()
-        if not orderbook or len(orderbook) == 0:
+        try:
+            orderbook = self.broker.get_order_book()
+            if not orderbook or len(orderbook) == 0:
+                return [{}]
+            return orderbook
+        except Exception as e:
+            print(f"{e} in stock broker order book")
+            print_exc()
             return [{}]
-        print(orderbook[0].keys())
-        return orderbook
 
     @property
     @post

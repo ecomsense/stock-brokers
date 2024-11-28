@@ -26,7 +26,7 @@ orders:
   trantype: side
   ret: validity
   prc: price
-  trgprc: trigger_price
+  rprc: trigger_price
   avgprc: average_price
   fillshares: filled_quantity
   norenordno: order_id
