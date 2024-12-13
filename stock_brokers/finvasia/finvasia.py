@@ -168,11 +168,10 @@ class Finvasia(Broker):
         """
         try:
             response = self.broker.modify_order(**kwargs)
-            if isinstance(response, dict) and response.get("norenordno") is not None:
-                return response["norenordno"]
-            else:
-                print(f"unexpected resonse from stock brokers order modify {response}")
+            if response is not None:
                 return response
+            else:
+                raise Exception("stock broker got no response for")
         except Exception as e:
             print(f"{e} order modify with params {kwargs}")
             print_exc()
