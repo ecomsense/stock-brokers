@@ -226,3 +226,6 @@ class Zerodha(Broker):
 
     def ltp(self, exchsym):
         return self.kite.ltp(exchsym)
+
+    def history(self, kwargs):
+        return self.kite.historical_data(**kwargs)
