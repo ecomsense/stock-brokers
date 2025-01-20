@@ -227,5 +227,8 @@ class Zerodha(Broker):
     def ltp(self, exchsym):
         return self.kite.ltp(exchsym)
 
-    def history(self, kwargs):
-        return self.kite.historical_data(**kwargs)
+    def historical(self, kwargs):
+        try:
+            return self.kite.historical_data(**kwargs)
+        except Exception as e:
+            print(f"{e} while historical")
