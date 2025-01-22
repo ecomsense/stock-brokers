@@ -4,6 +4,7 @@ from typing import Dict, List
 import pyotp
 import requests
 from kiteconnect import KiteConnect
+from stock_brokers.zerodha.api_helper import get_order_type
 
 from stock_brokers.base import Broker, post, pre
 from stock_brokers.helper import Helper
@@ -150,7 +151,7 @@ class Zerodha(Broker):
         if kwargs.get("price", None):
             order_args["price"] = kwargs["price"]
         if kwargs.get("order_type", None):
-            order_args["order_type"] = Bypass.get_order_type(kwargs["order_type"])
+            order_args["order_type"] = get_order_type(kwargs["order_type"])
         if kwargs.get("trigger_price", None):
             order_args["trigger_price"] = kwargs["trigger_price"]
         if kwargs.get("validity", None):
