@@ -232,4 +232,4 @@ class Zerodha(Broker):
         try:
             return self.kite.historical_data(**kwargs)
         except Exception as e:
-            print(f"{e} while historical")
+            print(f"{e} while historical with params {kwargs}")
