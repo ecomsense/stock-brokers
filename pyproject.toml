@@ -4,10 +4,13 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "stock-brokers"
-version = "0.0.1"
+version = "0.0.2"
 description = "a general stock broker package"
 authors = ["darkseid <uberdeveloper001@gmail.com>"]
-packages = [{include = "fake"}]
+packages = [
+  {include = "fake"}, 
+  {include = "finvasia"}
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"
