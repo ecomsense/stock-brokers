@@ -1,0 +1,198 @@
+from finvasia.api_helper import ShoonyaApiPy
+from base import Broker, pre, post
+from typing import List, Dict, Union
+import pendulum
+import pyotp
+from traceback import print_exc
+
+
+class Finvasia(Broker):
+    """
+    Automated Trading class
+    """
+
+    def __init__(
+        self,
+        user_id: str,
+        password: str,
+        pin: str,
+        vendor_code: str,
+        app_key: str,
+        imei: str,
+        broker: str = "",
+    ):
+        self._user_id = user_id
+        self._password = password
+        self._pin = pin
+        self._vendor_code = vendor_code
+        self._app_key = app_key
+        self._imei = imei
+        if broker == "profitmart":
+            self.broker = ShoonyaApiPy(
+                host="https://profitmax.profitmart.in/NorenWClientTP",
+                websocket="wss://profitmax.profitmart.in/NorenWSTP/",
+            )
+        elif broker == "flattrade":
+            self.broker = ShoonyaApiPy(
+                host="https://piconnect.flattrade.in/PiConnectTP/",
+                websocket="wss://piconnect.flattrade.in/PiConnectWSTp/",
+            )
+        else:
+            self.broker = ShoonyaApiPy()
+        super(Finvasia, self).__init__()
+
+    def authenticate(self) -> Union[Dict, None]:
+        try:
+            if len(self._pin) > 15:
+                twoFA = (
+                    self._pin if len(self._pin) == 4 else pyotp.TOTP(self._pin).now()
+                )
+            else:
+                twoFA = self._pin
+            return self.broker.login(
+                userid=self._user_id,
+                password=self._password,
+                twoFA=twoFA,
+                vendor_code=self._vendor_code,
+                api_secret=self._app_key,
+                imei=self._imei,
+            )
+        except Exception as e:
+            print(f"{e} in login")
+            print_exc()
+            return None
+
+    @property
+    @post
+    def orders(self) -> List[Dict]:
+        try:
+            orderbook = self.broker.get_order_book()
+            if not orderbook or len(orderbook) == 0:
+                return [{}]
+            return orderbook
+        except Exception as e:
+            print(f"{e} in stock broker order book")
+            print_exc()
+            return [{}]
+
+    @property
+    @post
+    def positions(self) -> List[Dict]:
+        positionbook = self.broker.get_positions()
+
+        if not positionbook or len(positionbook) == 0:
+            return [{}]
+
+        position_list = []
+        int_cols = [
+            "netqty",
+            "daybuyqty",
+            "daysellqty",
+            "cfbuyqty",
+            "cfsellqty",
+            "openbuyqty",
+            "opensellqty",
+        ]
+        float_cols = [
+            "daybuyamt",
+            "daysellamt",
+            "lp",
+            "rpnl",
+            "dayavgprc",
+            "daybuyavgprc",
+            "daysellavgprc",
+            "urmtom",
+        ]
+        for position in positionbook:
+            try:
+                for int_col in int_cols:
+                    position[int_col] = int(position.get(int_col, 0))
+                for float_col in float_cols:
+                    position[float_col] = float(position.get(float_col, 0))
+            except Exception as e:
+                print(f"{e} while iter stockbroker trades")
+                print_exc()
+            position_list.append(position)
+        return position_list
+
+    @property
+    @post
+    def trades(self) -> List[Dict]:
+        trade_list = []
+        tradebook = self.broker.get_trade_book()
+        if not tradebook or len(tradebook) == 0:
+            return [{}]
+
+        int_cols = ["flqty", "qty", "fillshares"]
+        float_cols = ["prc", "flprc"]
+        for trade in tradebook:
+            try:
+                for int_col in int_cols:
+                    trade[int_col] = int(trade.get(int_col, 0))
+                for float_col in float_cols:
+                    trade[float_col] = float(trade.get(float_col, 0))
+                now = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
+                ts = trade.get("norentm", now)
+                trade["broker_timestamp"] = str(
+                    pendulum.from_format(
+                        ts, fmt="HH:mm:ss DD-MM-YYYY", tz="Asia/Kolkata"
+                    )
+                )
+            except Exception as e:
+                print(f"{e} while iter stockbroker trades")
+                print_exc()
+            trade_list.append(trade)
+        return trade_list
+
+    @pre
+    def order_place(self, **kwargs) -> Union[str, None]:
+        try:
+            response = self.broker.place_order(**kwargs)
+            if isinstance(response, dict) and response.get("norenordno") is not None:
+                return response["norenordno"]
+        except Exception as err:
+            print(f"{err} in stock_brokers order_place with {kwargs}")
+            print_exc()
+
+    @post
+    def order_cancel(self, order_id: str) -> Union[Dict, None]:
+        """
+        Cancel an existing order
+        """
+        return self.broker.cancel_order(orderno=order_id)
+
+    @pre
+    def order_modify(self, **kwargs) -> Union[str, None]:
+        """
+        Modify an existing order
+        """
+        try:
+            response = self.broker.modify_order(**kwargs)
+            if response is not None:
+                return response
+            else:
+                raise Exception("stock broker got no response for")
+        except Exception as e:
+            print(f"{e} order modify with params {kwargs}")
+            print_exc()
+
+    @property
+    def margins(self):
+        return self.broker.get_limits()
+
+    def instrument_symbol(self, exch: str, txt: str):
+        res = self.broker.searchscrip(exchange=exch, searchtext=txt)
+        if res:
+            return res["values"][0].get("token", 0)
+
+    def historical(self, exch: str, tkn: str, fm: str, to: str, tf: int = 1):
+        """
+        ret = api.get_time_price_series(exchange='NSE', token='22',
+        starttime=obj_datetime.timestamp(), interval=5)
+        interval: acceptable integer values in minutes are
+        “1”, ”3”, “5”, “10”, “15”, “30”, “60”, “120”, “240”
+        """
+        return self.broker.get_time_price_series(exch, tkn, fm, to, tf)
+
+    def scriptinfo(self, exch: str, tkn: str):
+        return self.broker.get_quotes(exch, tkn)

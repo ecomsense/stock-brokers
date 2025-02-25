@@ -1,0 +1,9 @@
+wheel
+setuptools==58.2.0
+pydantic=1.9
+PyYAML==6.0
+pyOpenssl==21.0
+pandas
+pendulum
+pyotp
+requests
