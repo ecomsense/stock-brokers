@@ -18,7 +18,8 @@ def generate_unique_id():
 
 
 class Fake:
-    def __init__(self):
+    def __init__(self, **cnfg):
+        print(f"{cnfg=}")
         self._orders = pd.DataFrame()
 
     def authenticate():
