@@ -135,3 +135,10 @@ def post_order_hook(*orderbook):
     except Exception as e:
         print(f"{e} while processing stock_brokers orderbook")
         print_exc()
+
+
+def get_side(side):
+    if side[0].upper() == "B":
+        return "BUY"
+    else:
+        return "SELL"

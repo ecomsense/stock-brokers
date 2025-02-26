@@ -4,10 +4,9 @@ from typing import Dict, List
 import pyotp
 import requests
 from kiteconnect import KiteConnect
-from zerodha.api_helper import get_order_type
+from stock_brokers.zerodha.api_helper import get_order_type, get_side
 
-from base import Broker, post, pre
-from helper import Helper
+from stock_brokers.base import Broker, post, pre
 
 LOGINURL = "https://kite.zerodha.com/api/login"
 TWOFAURL = "https://kite.zerodha.com/api/twofa"
@@ -112,10 +111,10 @@ class Zerodha(Broker):
         order_args = dict(
             exchange=kwargs["exchange"],
             tradingsymbol=kwargs["tradingsymbol"],
-            transaction_type=Helper.get_side(kwargs["transaction_type"]),
+            transaction_type=get_side(kwargs["transaction_type"]),
             quantity=kwargs["quantity"],
             product=kwargs["product"],
-            order_type=Helper.get_order_type(kwargs["order_type"]),
+            order_type=get_order_type(kwargs["order_type"]),
             variety=kwargs.get("variety", "regular"),
         )
         if kwargs.get("price", None):

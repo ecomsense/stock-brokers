@@ -8,11 +8,7 @@ version = "0.0.2"
 description = "a general stock broker package"
 authors = ["darkseid <uberdeveloper001@gmail.com>"]
 packages = [
-  {include = "bypass"},
-  {include = "fake"}, 
-  {include = "finvasia"},
-  {include = "xts"},
-  {include = "zerodha"},
+  {include = "stock_brokers"},
 ]
 
 [tool.poetry.dependencies]
