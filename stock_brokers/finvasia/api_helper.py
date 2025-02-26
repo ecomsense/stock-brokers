@@ -1,4 +1,4 @@
-from finvasia.NorenApi import NorenApi
+from NorenApi import NorenApi
 import time
 import concurrent.futures
 import pendulum
