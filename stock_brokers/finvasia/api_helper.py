@@ -1,4 +1,4 @@
-from NorenApi import NorenApi
+from stock_brokers.finvasia.NorenApi import NorenApi
 import time
 import concurrent.futures
 import pendulum

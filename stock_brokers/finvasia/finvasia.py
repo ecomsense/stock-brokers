@@ -1,4 +1,4 @@
-from api_helper import ShoonyaApiPy
+from stock_brokers.finvasia.api_helper import ShoonyaApiPy
 from stock_brokers.base import Broker, pre, post
 from typing import List, Dict, Union
 import pendulum
