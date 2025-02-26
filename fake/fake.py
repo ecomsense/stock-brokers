@@ -22,7 +22,7 @@ class Fake:
         print(f"{cnfg=}")
         self._orders = pd.DataFrame()
 
-    def authenticate():
+    def authenticate(self):
         return True
 
     @property
