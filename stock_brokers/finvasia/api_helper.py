@@ -52,17 +52,17 @@ def get_product(product_type: str) -> str:
 
 def make_order_modify_args(**kwargs) -> Dict:
     order_args = dict(
-        order_id=kwargs.pop("order_id"),
+        orderno=kwargs.pop("orderno"),
         tradingsymbol=convert_symbol(
             kwargs.pop("tradingsymbol", None), kwargs["exchange"]
         ),
         exchange=kwargs.pop("exchange"),
-        price_type=get_order_type(kwargs.pop("price_type")),
-        price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
-        quantity=kwargs.pop("quantity"),
+        newprice_type=get_order_type(kwargs.pop("newprice_type")),
+        newprice=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("newprice", 0)),
+        newquantity=kwargs.pop("newquantity"),
     )
-    if kwargs.get("trigger_price", None):
-        order_args["trigger_price"] = kwargs["trigger_price"]
+    if kwargs.get("newtrigger_price", None):
+        order_args["newtrigger_price"] = kwargs.pop("newtrigger_price")
     return order_args
 
 
