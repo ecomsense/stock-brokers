@@ -53,9 +53,11 @@ def get_product(product_type: str) -> str:
 def make_order_modify_args(**kwargs) -> Dict:
     order_args = dict(
         order_id=kwargs.pop("order_id"),
-        symbol=convert_symbol(kwargs.pop("symbol", None), kwargs["exchange"]),
+        tradingsymbol=convert_symbol(
+            kwargs.pop("tradingsymbol", None), kwargs["exchange"]
+        ),
         exchange=kwargs.pop("exchange"),
-        order_type=get_order_type(kwargs.pop("order_type")),
+        price_type=get_order_type(kwargs.pop("price_type")),
         price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
         quantity=kwargs.pop("quantity"),
     )
@@ -66,18 +68,24 @@ def make_order_modify_args(**kwargs) -> Dict:
 
 def make_order_place_args(**kwargs) -> Dict:
     order_args = dict(
-        side=kwargs.pop("side")[0].upper(),
-        product=get_product(kwargs.pop("product", "I")),
-        symbol=convert_symbol(kwargs.pop("symbol", None), kwargs["exchange"]),
+        buy_or_sell=kwargs.pop("buy_or_sell")[0].upper(),
+        product_type=get_product(kwargs.pop("product_type", "I")),
+        tradingsymbol=convert_symbol(
+            kwargs.pop("tradingsymbol", None), kwargs["exchange"]
+        ),
         disclosed_quantity=kwargs.pop("disclosed_quantity", kwargs["quantity"]),
-        order_type=get_order_type(kwargs.pop("order_type")),
+        price_type=get_order_type(kwargs.pop("price_type")),
         price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
-        trigger_price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("trigger_price", 0)),
         validity=kwargs.pop("validity", "DAY"),
         quantity=kwargs["quantity"],
         exchange=kwargs["exchange"],
-        tag=kwargs.pop("tag", "stock_brokers"),
+        remarks=kwargs.pop("remarks", "stock_brokers"),
     )
+
+    if kwargs.get("trigger_price", None):
+        order_args["trigger_price"] = (
+            (lambda x: x if x >= 0 else 0.05)(kwargs.pop("trigger_price", 0)),
+        )
     return order_args
 
 
