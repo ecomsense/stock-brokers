@@ -52,13 +52,15 @@ def get_product(product_type: str) -> str:
 
 def make_order_modify_args(**kwargs) -> Dict:
     order_args = dict(
+        order_id=kwargs.pop("order_id"),
         symbol=convert_symbol(kwargs.pop("symbol", None), kwargs["exchange"]),
+        exchange=kwargs.pop("exchange"),
         order_type=get_order_type(kwargs.pop("order_type")),
         price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
-        trigger_price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("trigger_price", 0)),
         quantity=kwargs.pop("quantity"),
     )
-    order_args.update(kwargs)
+    if kwargs.get("trigger_price", None):
+        order_args["trigger_price"] = kwargs["trigger_price"]
     return order_args
 
 
@@ -72,11 +74,62 @@ def make_order_place_args(**kwargs) -> Dict:
         price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
         trigger_price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("trigger_price", 0)),
         validity=kwargs.pop("validity", "DAY"),
+        quantity=kwargs["quantity"],
+        exchange=kwargs["exchange"],
         tag=kwargs.pop("tag", "stock_brokers"),
     )
-    # kwargs now contain quantity and exchange
-    order_args.update(kwargs)
     return order_args
+
+
+def post_trade_hook(*tradebook):
+    try:
+        trade_list = []
+        keys = [
+            "exchange",
+            "symbol",
+            "order_id",
+            "quantity",
+            "side",
+            "product",
+            "price_type",
+            "fill_shares",
+            "average_price",
+            "exchange_order_id",
+            "tag",
+            "validity",
+            "price_precison",
+            "tick_size",
+            "fill_timestamp",
+            "fill_quantity",
+            "fill_price",
+            "source",
+            "broker_timestamp",
+        ]
+        if tradebook and any(tradebook):
+            tradebook = [filter_dictionary_by_keys(order, keys) for order in orderbook]
+            int_cols = ["flqty", "qty", "fillshares"]
+            float_cols = ["prc", "flprc"]
+            for trade in tradebook:
+                try:
+                    for int_col in int_cols:
+                        trade[int_col] = int(trade.get(int_col, 0))
+                    for float_col in float_cols:
+                        trade[float_col] = float(trade.get(float_col, 0))
+                    now = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
+                    ts = trade.get("norentm", now)
+                    trade["broker_timestamp"] = str(
+                        pendulum.from_format(
+                            ts, fmt="HH:mm:ss DD-MM-YYYY", tz="Asia/Kolkata"
+                        )
+                    )
+                    trade_list.append(trade)
+                except Exception as e:
+                    print(f"{e} while iter stockbroker trades")
+                    print_exc()
+        return trade_list
+    except Exception as e:
+        print(f"{e} while processing stock_brokers tradebook")
+        print_exc()
 
 
 def post_order_hook(*orderbook):

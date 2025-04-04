@@ -1,7 +1,12 @@
-from stock_brokers.finvasia.api_helper import ShoonyaApiPy
+from stock_brokers.finvasia.api_helper import (
+    ShoonyaApiPy,
+    make_order_place_args,
+    make_order_modify_args,
+    post_order_hook,
+    post_trade_hook,
+)
 from stock_brokers.base import Broker, pre, post
 from typing import List, Dict, Union
-import pendulum
 import pyotp
 from traceback import print_exc
 
@@ -69,9 +74,22 @@ class Finvasia(Broker):
             orderbook = self.broker.get_order_book()
             if not orderbook or len(orderbook) == 0:
                 return [{}]
-            return orderbook
+            return post_order_hook(*orderbook)
         except Exception as e:
             print(f"{e} in stock broker order book")
+            print_exc()
+            return [{}]
+
+    @property
+    @post
+    def trades(self) -> List[Dict]:
+        try:
+            tradebook = self.broker.get_trade_book()
+            if not tradebook or len(tradebook) == 0:
+                return []
+            return post_trade_hook(*tradebook)
+        except Exception as e:
+            print(f"{e} in stock broker trade book")
             print_exc()
             return [{}]
 
@@ -115,39 +133,13 @@ class Finvasia(Broker):
             position_list.append(position)
         return position_list
 
-    @property
-    @post
-    def trades(self) -> List[Dict]:
-        trade_list = []
-        tradebook = self.broker.get_trade_book()
-        if not tradebook or len(tradebook) == 0:
-            return [{}]
-
-        int_cols = ["flqty", "qty", "fillshares"]
-        float_cols = ["prc", "flprc"]
-        for trade in tradebook:
-            try:
-                for int_col in int_cols:
-                    trade[int_col] = int(trade.get(int_col, 0))
-                for float_col in float_cols:
-                    trade[float_col] = float(trade.get(float_col, 0))
-                now = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
-                ts = trade.get("norentm", now)
-                trade["broker_timestamp"] = str(
-                    pendulum.from_format(
-                        ts, fmt="HH:mm:ss DD-MM-YYYY", tz="Asia/Kolkata"
-                    )
-                )
-            except Exception as e:
-                print(f"{e} while iter stockbroker trades")
-                print_exc()
-            trade_list.append(trade)
-        return trade_list
-
     @pre
     def order_place(self, **kwargs) -> Union[str, None]:
         try:
-            response = self.broker.place_order(**kwargs)
+            print(f"before making args {kwargs}")
+            margs = make_order_place_args(**kwargs)
+            print(f"after making args {margs}")
+            response = self.broker.place_order(**margs)
             if isinstance(response, dict) and response.get("norenordno") is not None:
                 return response["norenordno"]
         except Exception as err:
@@ -167,7 +159,10 @@ class Finvasia(Broker):
         Modify an existing order
         """
         try:
-            response = self.broker.modify_order(**kwargs)
+            print(f"before modify args {kwargs}")
+            margs = make_order_modify_args(**kwargs)
+            print(f"after modify args {margs}")
+            response = self.broker.modify_order(**margs)
             if response is not None:
                 return response
             else:
