@@ -73,7 +73,7 @@ def make_order_place_args(**kwargs) -> Dict:
         tradingsymbol=convert_symbol(
             kwargs.pop("tradingsymbol", None), kwargs["exchange"]
         ),
-        disclosed_quantity=kwargs.pop("disclosed_quantity", kwargs["quantity"]),
+        discloseqty=kwargs.pop("discloseqty", kwargs["quantity"]),
         price_type=get_order_type(kwargs.pop("price_type")),
         price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
         validity=kwargs.pop("validity", "DAY"),
