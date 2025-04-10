@@ -76,7 +76,7 @@ def make_order_place_args(**kwargs) -> Dict:
         discloseqty=kwargs.pop("discloseqty", kwargs["quantity"]),
         price_type=get_order_type(kwargs.pop("price_type")),
         price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
-        validity=kwargs.pop("validity", "DAY"),
+        retention=kwargs.pop("retention", "DAY"),
         quantity=kwargs["quantity"],
         exchange=kwargs["exchange"],
         remarks=kwargs.pop("remarks", "stock_brokers"),
