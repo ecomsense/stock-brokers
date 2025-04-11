@@ -114,7 +114,7 @@ def post_trade_hook(*tradebook):
             "broker_timestamp",
         ]
         if tradebook and any(tradebook):
-            tradebook = [filter_dictionary_by_keys(order, keys) for order in orderbook]
+            tradebook = [filter_dictionary_by_keys(trade, keys) for trade in tradebook]
             int_cols = ["flqty", "qty", "fillshares"]
             float_cols = ["prc", "flprc"]
             for trade in tradebook:
