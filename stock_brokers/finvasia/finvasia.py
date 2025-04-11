@@ -74,7 +74,8 @@ class Finvasia(Broker):
             orderbook = self.broker.get_order_book()
             if not orderbook or len(orderbook) == 0:
                 return [{}]
-            return post_order_hook(*orderbook)
+            # return post_order_hook(*orderbook)
+            return orderbook
         except Exception as e:
             print(f"{e} in stock broker order book")
             print_exc()
@@ -87,7 +88,8 @@ class Finvasia(Broker):
             tradebook = self.broker.get_trade_book()
             if not tradebook or len(tradebook) == 0:
                 return []
-            return post_trade_hook(*tradebook)
+            # return post_trade_hook(*tradebook)
+            return tradebook
         except Exception as e:
             print(f"{e} in stock broker trade book")
             print_exc()
@@ -128,7 +130,7 @@ class Finvasia(Broker):
                 for float_col in float_cols:
                     position[float_col] = float(position.get(float_col, 0))
             except Exception as e:
-                print(f"{e} while iter stockbroker trades")
+                print(f"{e} while iter stockbroker positions")
                 print_exc()
             position_list.append(position)
         return position_list
