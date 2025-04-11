@@ -125,11 +125,13 @@ def post_trade_hook(*tradebook):
                         trade[float_col] = float(trade.get(float_col, 0))
                     now = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
                     ts = trade.get("norentm", now)
+                    """
                     trade["broker_timestamp"] = str(
                         pendulum.from_format(
                             ts, fmt="HH:mm:ss DD-MM-YYYY", tz="Asia/Kolkata"
                         )
                     )
+                    """
                     trade_list.append(trade)
                 except Exception as e:
                     print(f"{e} while iter stockbroker trades")
