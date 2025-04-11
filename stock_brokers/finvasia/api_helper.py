@@ -63,6 +63,7 @@ def make_order_modify_args(**kwargs) -> Dict:
     )
     if kwargs.get("newtrigger_price", None):
         order_args["newtrigger_price"] = kwargs.pop("newtrigger_price")
+    print(f"remaining dictionary items: {kwargs}")
     return order_args
 
 
@@ -75,17 +76,16 @@ def make_order_place_args(**kwargs) -> Dict:
         ),
         discloseqty=kwargs.pop("discloseqty", kwargs["quantity"]),
         price_type=get_order_type(kwargs.pop("price_type")),
-        price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
         retention=kwargs.pop("retention", "DAY"),
         quantity=kwargs["quantity"],
         exchange=kwargs["exchange"],
         remarks=kwargs.pop("remarks", "stock_brokers"),
     )
-
     if kwargs.get("trigger_price", None):
-        order_args["trigger_price"] = (
-            (lambda x: x if x >= 0 else 0.05)(kwargs.pop("trigger_price", 0)),
-        )
+        order_args["trigger_price"] = kwargs.pop("trigger_price")
+    if kwargs.get("price", None):
+        order_args["price"] = kwargs.pop("price")
+    print(f"remaing dict {kwargs}")
     return order_args
 
 
