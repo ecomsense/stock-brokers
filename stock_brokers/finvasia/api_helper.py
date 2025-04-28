@@ -14,6 +14,7 @@ def convert_time_string(dct, key, fmt):
         ts = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
     else:
         ts = dct.pop(key)
+        print(ts)
     dct[key] = str(pendulum.from_format(ts, fmt=fmt, tz="Asia/Kolkata"))
     return dct
 
