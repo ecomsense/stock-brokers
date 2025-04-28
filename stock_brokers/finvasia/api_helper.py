@@ -10,9 +10,8 @@ api = None
 
 def convert_time_string(dct, key, fmt):
     # pendulum current datetime
-    now = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
-    if dct[key] is None:
-        ts = now
+    if dct.get(key, None) is None:
+        ts = pendulum.now(tz="Asia/Kolkata").format("DD-MM-YYYY HH:mm:ss")
     else:
         ts = dct.pop(key)
     dct[key] = str(pendulum.from_format(ts, fmt=fmt, tz="Asia/Kolkata"))
