@@ -6,7 +6,7 @@ import requests
 from kiteext.kiteext import KiteExt
 
 from stock_brokers.base import Broker, post, pre
-from stock_brokers.helper import Helper
+from stock_brokers.bypass.api_helper import get_order_type, get_side
 
 
 class Bypass(Broker):
@@ -86,10 +86,10 @@ class Bypass(Broker):
         order_args = dict(
             exchange=kwargs["exchange"],
             tradingsymbol=kwargs["tradingsymbol"],
-            transaction_type=Helper.get_side(kwargs["transaction_type"]),
+            transaction_type=get_side(kwargs["transaction_type"]),
             quantity=kwargs["quantity"],
             product=kwargs["product"],
-            order_type=Helper.get_order_type(kwargs["order_type"]),
+            order_type=get_order_type(kwargs["order_type"]),
             variety=kwargs.get("variety", "regular"),
         )
         if kwargs.get("price", None):
@@ -125,7 +125,7 @@ class Bypass(Broker):
         if kwargs.get("price", None):
             order_args["price"] = kwargs["price"]
         if kwargs.get("order_type", None):
-            order_args["order_type"] = Helper.get_order_type(kwargs["order_type"])
+            order_args["order_type"] = get_order_type(kwargs["order_type"])
         if kwargs.get("trigger_price", None):
             order_args["trigger_price"] = kwargs["trigger_price"]
         if kwargs.get("validity", None):
