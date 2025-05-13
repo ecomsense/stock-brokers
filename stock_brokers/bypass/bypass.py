@@ -6,7 +6,11 @@ import requests
 from kiteext.kiteext import KiteExt
 
 from stock_brokers.base import Broker, post, pre
-from stock_brokers.bypass.api_helper import get_order_type, get_side
+from stock_brokers.bypass.api_helper import (
+    get_order_type,
+    get_side,
+    make_order_place_args,
+)
 
 
 class Bypass(Broker):
@@ -83,21 +87,9 @@ class Bypass(Broker):
             price=None, validity=None, disclosed_quantity=None, trigger_price=None,
             squareoff=None, stoploss=None, trailing_stoploss=None, tag=None
         """
-        order_args = dict(
-            exchange=kwargs["exchange"],
-            tradingsymbol=kwargs["tradingsymbol"],
-            transaction_type=get_side(kwargs["transaction_type"]),
-            quantity=kwargs["quantity"],
-            product=kwargs["product"],
-            order_type=get_order_type(kwargs["order_type"]),
-            variety=kwargs.get("variety", "regular"),
-        )
-        if kwargs.get("price", None):
-            order_args["price"] = kwargs["price"]
-        if kwargs.get("trigger_price", None):
-            order_args["trigger_price"] = kwargs["trigger_price"]
-
-        order_args["tag"] = kwargs.pop("tag", "stock_brokers")
+        print(f"before order place {kwargs}")
+        order_args = make_order_place_args(**kwargs)
+        print(f"after order_place {order_args}")
         return self.kite.place_order(**order_args)
 
     @pre

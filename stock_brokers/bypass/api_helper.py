@@ -73,18 +73,27 @@ def make_order_modify_args(**kwargs) -> Dict:
 
 def make_order_place_args(**kwargs) -> Dict:
     order_args = dict(
-        side=kwargs.pop("side")[0].upper(),
-        product=get_product(kwargs.pop("product", "I")),
-        symbol=convert_symbol(kwargs.pop("symbol", None), kwargs["exchange"]),
-        disclosed_quantity=kwargs.pop("disclosed_quantity", kwargs["quantity"]),
-        order_type=get_order_type(kwargs.pop("order_type")),
-        price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
-        trigger_price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("trigger_price", 0)),
-        validity=kwargs.pop("validity", "DAY"),
-        tag=kwargs.pop("tag", "stock_brokers"),
+        exchange=kwargs.pop("exchange"),
+        tradingsymbol=kwargs.pop("symbol"),
+        side=kwargs.pop("side"),
+        quantity=kwargs.pop("quantity"),
+        product=kwargs.pop("product", "MIS"),
+        variety=kwargs.pop("variety", "regular"),
     )
+    if kwargs.get("order_type", None):
+        order_args["order_type"] = get_order_type(kwargs.pop("order_type"))
+    else:
+        order_args["order_type"] = "MKT"
+    if kwargs.get("price", None):
+        order_args["price"] = kwargs.pop("price")
+    if kwargs.get("trigger_price", None):
+        order_args["trigger_price"] = kwargs.pop("trigger_price")
+    if kwargs.get("disclosed_quantity", None):
+        order_args["disclosed_quantity"] = kwargs.pop("disclosed_quantity")
+
+    order_args["tag"] = kwargs.pop("tag", "stock_brokers")
     # kwargs now contain quantity and exchange
-    order_args.update(kwargs)
+    print(f"remaining in dict {kwargs}")
     return order_args
 
 
