@@ -41,19 +41,6 @@ def filter_dictionary_by_keys(elephant: Dict, keys: List) -> Dict:
     return filtered
 
 
-def get_order_type(order_type: str) -> str:
-    order_types = {
-        "LIMIT": "LMT",
-        "MARKET": "MKT",
-        "SL": "SL-LMT",
-        "SLL": "SL-LMT",
-        "SL-L": "SL-LMT",
-        "SLM": "SL-MKT",
-        "SL-M": "SL-MKT",
-    }
-    return order_types.get(order_type.upper(), order_type)
-
-
 def get_product(product_type: str) -> str:
     product_types = {"MIS": "I", "CNC": "C", "NRML": "M", "BRACKET": "B", "COVER": "H"}
     return product_types.get(product_type.upper(), product_type)
@@ -62,7 +49,7 @@ def get_product(product_type: str) -> str:
 def make_order_modify_args(**kwargs) -> Dict:
     order_args = dict(
         symbol=convert_symbol(kwargs.pop("symbol", None), kwargs["exchange"]),
-        order_type=get_order_type(kwargs.pop("order_type")),
+        order_type=kwargs.pop("order_type"),
         price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("price", 0)),
         trigger_price=(lambda x: x if x >= 0 else 0.05)(kwargs.pop("trigger_price", 0)),
         quantity=kwargs.pop("quantity"),
@@ -81,9 +68,7 @@ def make_order_place_args(**kwargs) -> Dict:
         variety=kwargs.pop("variety", "regular"),
     )
     if kwargs.get("order_type", None):
-        order_args["order_type"] = get_order_type(kwargs.pop("order_type"))
-    else:
-        order_args["order_type"] = "MKT"
+        order_args["order_type"] = kwargs.pop("order_type")
     if kwargs.get("price", None):
         order_args["price"] = kwargs.pop("price")
     if kwargs.get("trigger_price", None):
