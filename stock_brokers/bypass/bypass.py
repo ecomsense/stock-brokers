@@ -7,8 +7,6 @@ from kiteext.kiteext import KiteExt
 
 from stock_brokers.base import Broker, post, pre
 from stock_brokers.bypass.api_helper import (
-    get_order_type,
-    get_side,
     make_order_place_args,
 )
 
@@ -117,7 +115,7 @@ class Bypass(Broker):
         if kwargs.get("price", None):
             order_args["price"] = kwargs["price"]
         if kwargs.get("order_type", None):
-            order_args["order_type"] = get_order_type(kwargs["order_type"])
+            order_args["order_type"] = kwargs["order_type"]
         if kwargs.get("trigger_price", None):
             order_args["trigger_price"] = kwargs["trigger_price"]
         if kwargs.get("validity", None):
