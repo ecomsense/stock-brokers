@@ -74,7 +74,7 @@ def make_order_modify_args(**kwargs) -> Dict:
 def make_order_place_args(**kwargs) -> Dict:
     order_args = dict(
         tradingsymbol=kwargs.pop("tradingsymbol"),
-        transaction_type=kwargs.pop("side"),
+        transaction_type=kwargs.pop("transaction_type"),
         exchange=kwargs.pop("exchange"),
         quantity=kwargs.pop("quantity"),
         product=kwargs.pop("product", "MIS"),
