@@ -53,6 +53,7 @@ class Bypass(Broker):
             response = session.post("https://kite.zerodha.com/api/login", data=data)
             otp = pyotp.TOTP(self.totp).now()
             twofa = f"{int(otp):06d}"
+            print(f"kiteext response json data {response}")
             response = session.post(
                 "https://kite.zerodha.com/api/twofa",
                 data={
