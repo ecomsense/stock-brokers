@@ -191,6 +191,10 @@ class Bypass(Broker):
         return self.kite.margins()
 
     @property
+    def holdings(self):
+        return self.kite.holdings()
+
+    @property
     def remove_token(self):
         if os.path.exists(self.tokpath):
             os.remove(self.tokpath)

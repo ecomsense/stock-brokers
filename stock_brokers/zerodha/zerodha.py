@@ -224,6 +224,10 @@ class Zerodha(Broker):
     def margins(self):
         return self.kite.margins()
 
+    @property
+    def holdings(self):
+        return self.kite.holdings()
+
     def ltp(self, exchsym):
         return self.kite.ltp(exchsym)
 
