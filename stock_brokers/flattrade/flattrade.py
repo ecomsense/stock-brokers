@@ -4,8 +4,8 @@ from stock_brokers.flattrade.api_helper import (
     make_order_modify_args,
     post_order_hook,
     post_trade_hook,
-    get_session_token,
 )
+from stock_brokers.flattrade.session import get_session_token
 from stock_brokers.base import Broker, pre, post
 from typing import List, Dict, Union
 import pyotp
