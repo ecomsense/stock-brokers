@@ -52,9 +52,9 @@ class Flattrade(Broker):
                 verbose=True,
             )
             return self.broker.set_session(
-                user_id=self._user_id,
+                userid=self._user_id,
                 password=self._password,
-                user_token=self._user_token,
+                usertoken=self._user_token,
             )
         except Exception as e:
             print(f"{e} in login")
