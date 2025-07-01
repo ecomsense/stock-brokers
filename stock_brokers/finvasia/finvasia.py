@@ -24,6 +24,7 @@ class Finvasia(Broker):
         vendor_code: str,
         app_key: str,
         imei: str,
+        api_secret: str = "",
         broker: str = "",
     ):
         self._user_id = user_id
@@ -31,16 +32,12 @@ class Finvasia(Broker):
         self._pin = pin
         self._vendor_code = vendor_code
         self._app_key = app_key
+        self._api_secret = api_secret
         self._imei = imei
         if broker == "profitmart":
             self.broker = ShoonyaApiPy(
                 host="https://profitmax.profitmart.in/NorenWClientTP",
                 websocket="wss://profitmax.profitmart.in/NorenWSTP/",
-            )
-        elif broker == "flattrade":
-            self.broker = ShoonyaApiPy(
-                host="https://piconnect.flattrade.in/PiConnectTP/",
-                websocket="wss://piconnect.flattrade.in/PiConnectWSTp/",
             )
         else:
             self.broker = ShoonyaApiPy()
@@ -59,7 +56,7 @@ class Finvasia(Broker):
                 password=self._password,
                 twoFA=twoFA,
                 vendor_code=self._vendor_code,
-                api_secret=self._app_key,
+                api_secret=self._api_secret,
                 imei=self._imei,
             )
         except Exception as e:
