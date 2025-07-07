@@ -184,9 +184,11 @@ def post_order_hook(*orderbook):
             order = convert_time_string(
                 order, "exchange_timestamp", "DD-MM-YYYY HH:mm:ss"
             )
+            """
             order = convert_time_string(
                 order, "broker_timestamp", "HH:mm:ss DD-MM-YYYY"
             )
+            """
             order_list.append(order)
         return order_list
     except Exception as e:
