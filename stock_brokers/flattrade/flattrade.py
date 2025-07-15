@@ -25,7 +25,7 @@ class Flattrade(Broker):
         vendor_code: str,
         app_key: str,
         imei: str,
-        api_secret: str = "",
+        api_secret: str,
         broker: str = "",
     ):
         self._user_id = user_id
@@ -33,8 +33,8 @@ class Flattrade(Broker):
         self._pin = pin
         self._vendor_code = vendor_code
         self._app_key = app_key
-        self._imei = imei
         self._api_secret = api_secret
+        self._imei = imei
         self.broker = ShoonyaApiPy(
             host="https://piconnect.flattrade.in/PiConnectTP/",
             websocket="wss://piconnect.flattrade.in/PiConnectWSTp/",
@@ -55,7 +55,7 @@ class Flattrade(Broker):
                 userid=self._user_id,
                 password=self._password,
                 usertoken=self._user_token,
-            )
+            ) # type: ignore
         except Exception as e:
             print(f"{e} in login")
             print_exc()

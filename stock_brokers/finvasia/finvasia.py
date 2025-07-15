@@ -24,15 +24,13 @@ class Finvasia(Broker):
         vendor_code: str,
         app_key: str,
         imei: str,
-        api_secret: str = "",
         broker: str = "",
     ):
         self._user_id = user_id
         self._password = password
         self._pin = pin
         self._vendor_code = vendor_code
-        self._app_key = app_key
-        self._api_secret = api_secret
+        self._app_key = app_key       
         self._imei = imei
         if broker == "profitmart":
             self.broker = ShoonyaApiPy(
@@ -56,7 +54,7 @@ class Finvasia(Broker):
                 password=self._password,
                 twoFA=twoFA,
                 vendor_code=self._vendor_code,
-                api_secret=self._api_secret,
+                api_secret=self._app_key,
                 imei=self._imei,
             )
         except Exception as e:
