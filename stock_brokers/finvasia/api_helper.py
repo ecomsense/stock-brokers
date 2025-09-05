@@ -10,17 +10,18 @@ api = None
 
 def convert_time_string(dct, key, fmt):
     # pendulum current datetime
-    if dct.get(key, None) is None:
+    if key not in dct or dct[key] is None:
         print(f"{key} not found in {dct}")
         return dct
+
     try:
         ts = dct.pop(key)
         dct[key] = str(pendulum.from_format(ts, fmt=fmt, tz="Asia/Kolkata"))
-        return dct
     except Exception as e:
         print(f"{e} while converting time to string for {key=} and {fmt=}")
         ts = pendulum.now(tz="Asia/Kolkata").format(fmt)
         dct[key] = str(pendulum.from_format(ts, fmt=fmt, tz="Asia/Kolkata"))
+    finally:
         return dct
 
 
