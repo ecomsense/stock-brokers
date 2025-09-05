@@ -69,8 +69,7 @@ class Finvasia(Broker):
             orderbook = self.broker.get_order_book()
             if not orderbook or len(orderbook) == 0:
                 return [{}]
-            return post_order_hook(*orderbook)
-            # return orderbook
+            return orderbook
         except Exception as e:
             print(f"{e} in stock broker order book")
             print_exc()
