@@ -11,7 +11,8 @@ api = None
 def convert_time_string(dct, key, fmt):
     # pendulum current datetime
     if key not in dct or dct[key] is None:
-        print(f"{key} not found in {dct}")
+        ts = pendulum.now(tz="Asia/Kolkata").format(fmt)
+        dct[key] = str(pendulum.from_format(ts, fmt=fmt, tz="Asia/Kolkata"))
         return dct
 
     try:
