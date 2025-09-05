@@ -176,6 +176,7 @@ def post_order_hook(*orderbook):
         int_cols = ["filled_quantity", "quantity"]
         order_list = []
         for order in orderbook:
+            print("stock broker order", order)
             for int_col in int_cols:
                 order[int_col] = (
                     lambda x: int(x) if isinstance(x, str) and x.isdigit() else 0
