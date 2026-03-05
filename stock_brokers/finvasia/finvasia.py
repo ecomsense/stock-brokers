@@ -9,7 +9,7 @@ from stock_brokers.base import Broker, pre, post
 from typing import List, Dict, Union
 import pyotp
 from traceback import print_exc
-
+import logging
 
 class Finvasia(Broker):
     """
@@ -58,7 +58,7 @@ class Finvasia(Broker):
                 imei=self._imei,
             )
         except Exception as e:
-            print(f"{e} in login")
+            logging.error(f"{e} in login")
             print_exc()
             return None
 
@@ -71,7 +71,7 @@ class Finvasia(Broker):
                 return [{}]
             return orderbook
         except Exception as e:
-            print(f"{e} in stock broker order book")
+            logging.error(f"{e} in stock broker order book")
             print_exc()
             return [{}]
 
@@ -85,7 +85,7 @@ class Finvasia(Broker):
             # return post_trade_hook(*tradebook)
             return tradebook
         except Exception as e:
-            print(f"{e} in stock broker trade book")
+            logging.error(f"{e} in stock broker trade book")
             print_exc()
             return [{}]
 
@@ -124,7 +124,7 @@ class Finvasia(Broker):
                 for float_col in float_cols:
                     position[float_col] = float(position.get(float_col, 0))
             except Exception as e:
-                print(f"{e} while iter stockbroker positions")
+                logging.error(f"{e} while iter stockbroker positions")
                 print_exc()
             position_list.append(position)
         return position_list
@@ -132,14 +132,14 @@ class Finvasia(Broker):
     @pre
     def order_place(self, **kwargs) -> Union[str, None]:
         try:
-            print(f"before making args {kwargs}")
+            logging.info(f"before making args {kwargs}")
             margs = make_order_place_args(**kwargs)
-            print(f"after making args {margs}")
+            logging.debug(f"after making args {margs}")
             response = self.broker.place_order(**margs)
             if isinstance(response, dict) and response.get("norenordno") is not None:
                 return response["norenordno"]
         except Exception as err:
-            print(f"{err} in stock_brokers order_place with {kwargs}")
+            logging.error(f"{err} in stock_brokers order_place with {kwargs}")
             print_exc()
 
     @post
@@ -155,16 +155,16 @@ class Finvasia(Broker):
         Modify an existing order
         """
         try:
-            print(f"before modify args {kwargs}")
+            logging.info(f"before modify args {kwargs}")
             margs = make_order_modify_args(**kwargs)
-            print(f"after modify args {margs}")
+            logging.debug(f"after modify args {margs}")
             response = self.broker.modify_order(**margs)
             if response is not None:
                 return response
             else:
                 raise Exception("stock broker got no response for")
         except Exception as e:
-            print(f"{e} order modify with params {kwargs}")
+            logging.error(f"{e} order modify with params {kwargs}")
             print_exc()
 
     @property
