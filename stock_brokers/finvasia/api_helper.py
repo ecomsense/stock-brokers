@@ -256,7 +256,7 @@ def get_time(time_string):
 class ShoonyaApiPy(NorenApi):
     def __init__(
         self,
-        host="https://api.shoonya.com/NorenWClientTP/",
+        host="https://api.shoonya.com/NorenWClientAPI/",
         websocket="wss://api.shoonya.com/NorenWSTP/",
     ):
         NorenApi.__init__(self, host=host, websocket=websocket)
@@ -269,7 +269,6 @@ class ShoonyaApiPy(NorenApi):
         resp_ok = 0
         result = []
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-
             future_to_url = {
                 executor.submit(self.place_order, order): order for order in orders
             }
