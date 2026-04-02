@@ -6,10 +6,12 @@ from stock_brokers.finvasia.api_helper import (
     post_trade_hook,
 )
 from stock_brokers.base import Broker, pre, post
+from stock_brokers.finvasia.session import get_auth_code_automated
 from typing import List, Dict, Union
-import pyotp
+from pyotp import TOTP
 from traceback import print_exc
 import logging
+
 
 class Finvasia(Broker):
     """
@@ -23,15 +25,19 @@ class Finvasia(Broker):
         pin: str,
         vendor_code: str,
         app_key: str,
+        api_secret: str,
         imei: str,
+        oauth_url: str,
         broker: str = "",
     ):
         self._user_id = user_id
         self._password = password
         self._pin = pin
         self._vendor_code = vendor_code
-        self._app_key = app_key       
+        self._app_key = app_key
+        self._api_secret = api_secret
         self._imei = imei
+        self._oauth_url = oauth_url
         if broker == "profitmart":
             self.broker = ShoonyaApiPy(
                 host="https://profitmax.profitmart.in/NorenWClientTP",
@@ -43,22 +49,24 @@ class Finvasia(Broker):
 
     def authenticate(self) -> Union[Dict, None]:
         try:
-            if len(self._pin) > 15:
-                twoFA = (
-                    self._pin if len(self._pin) == 4 else pyotp.TOTP(self._pin).now()
-                )
-            else:
-                twoFA = self._pin
-            return self.broker.login(
+            login_url = self.broker.getOAuthURL(
+                oauth_url=self._oauth_url, api_key=self._app_key
+            )
+            print(f"trying to auth with {login_url}")
+            auth_code = get_auth_code_automated(
+                login_url=login_url,
                 userid=self._user_id,
                 password=self._password,
-                twoFA=twoFA,
-                vendor_code=self._vendor_code,
-                api_secret=self._app_key,
-                imei=self._imei,
+                otp=TOTP(self._pin).now(),
             )
+
+            acc_tok, usrid, ref_tok, actid = self.broker.getAccessToken(
+                auth_code, self._api_secret, self._app_key, self._user_id
+            )
+            print(f"{acc_tok=}{usrid=}{ref_tok=}{actid=}")
+
         except Exception as e:
-            logging.error(f"{e} in login")
+            print(f"{e} in login")
             print_exc()
             return None
 
