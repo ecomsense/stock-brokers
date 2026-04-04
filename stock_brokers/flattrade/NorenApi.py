@@ -13,6 +13,8 @@ from datetime import datetime as dt
 
 logger = logging.getLogger(__name__)
 
+requests.packages.urllib3.util.connection.HAS_IPV6 = False
+
 
 class position:
     prd: str
@@ -76,7 +78,6 @@ def reportinfo(msg):
 
 
 class NorenApi(object):
-
     TRANSACTION_TYPE_SELL = "S"
     TRANSACTION_TYPE_BUY = "B"
 
