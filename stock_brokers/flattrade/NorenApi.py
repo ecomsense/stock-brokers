@@ -13,7 +13,11 @@ from datetime import datetime as dt
 
 logger = logging.getLogger(__name__)
 
+print("Default connection:", requests.get("https://api64.ipify.org").text)
+
 requests.packages.urllib3.util.connection.HAS_IPV6 = False
+
+print("Forced IPv4 connection:", requests.get("https://api64.ipify.org").text)
 
 
 class position:
