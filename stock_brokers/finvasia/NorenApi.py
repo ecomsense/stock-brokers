@@ -76,7 +76,6 @@ def reportinfo(msg):
 
 
 class NorenApi(object):
-
     TRANSACTION_TYPE_SELL = "S"
     TRANSACTION_TYPE_BUY = "B"
 
