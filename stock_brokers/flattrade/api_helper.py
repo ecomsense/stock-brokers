@@ -5,8 +5,6 @@ import pendulum
 from traceback import print_exc
 from typing import List, Dict
 
-api = None
-
 
 def convert_time_string(dct, key, fmt):
     # pendulum current datetime
@@ -211,10 +209,13 @@ def convert_symbol(symbol: str, exchange: str = "NSE") -> str:
     return symbol
 
 
+api = None
+
+
 class Order:
     def __init__(
         self,
-        buy_or_sell: str = None,
+        buy_or_sell: str = "BUY",
         product_type: str = None,
         exchange: str = None,
         tradingsymbol: str = None,
@@ -225,7 +226,7 @@ class Order:
         discloseqty: int = 0,
         retention: str = "DAY",
         remarks: str = "tag",
-        order_id: str = None,
+        order_id=None,
     ):
         self.buy_or_sell = buy_or_sell
         self.product_type = product_type
@@ -251,11 +252,7 @@ def get_time(time_string):
 
 
 class ShoonyaApiPy(NorenApi):
-    def __init__(
-        self,
-        host="https://api.shoonya.com/NorenWClientTP/",
-        websocket="wss://api.shoonya.com/NorenWSTP/",
-    ):
+    def __init__(self, host, websocket):
         NorenApi.__init__(self, host=host, websocket=websocket)
         global api
         api = self

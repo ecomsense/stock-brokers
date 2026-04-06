@@ -8,7 +8,6 @@ from stock_brokers.flattrade.api_helper import (
 from stock_brokers.flattrade.session import get_session_token
 from stock_brokers.base import Broker, pre, post
 from typing import List, Dict, Union
-import pyotp
 from traceback import print_exc
 
 
@@ -36,8 +35,8 @@ class Flattrade(Broker):
         self._api_secret = api_secret
         self._imei = imei
         self.broker = ShoonyaApiPy(
-            host="https://piconnect.flattrade.in/PiConnectTP/",
-            websocket="wss://piconnect.flattrade.in/PiConnectWSTp/",
+            host="https://piconnect.flattrade.in/PiConnectAPI/",
+            websocket="wss://piconnect.flattrade.in/PiConnectWSAPI/",
         )
         super(Flattrade, self).__init__()
 
@@ -55,7 +54,7 @@ class Flattrade(Broker):
                 userid=self._user_id,
                 password=self._password,
                 usertoken=self._user_token,
-            ) # type: ignore
+            )  # type: ignore
         except Exception as e:
             print(f"{e} in login")
             print_exc()
@@ -186,4 +185,4 @@ class Flattrade(Broker):
         return self.broker.get_time_price_series(exch, tkn, fm, to, tf)
 
     def scriptinfo(self, exch: str, tkn: str):
-        return self.broker.get_quotes(exch, tkn)
+        return self.broker.get_security_info(exch, tkn)
