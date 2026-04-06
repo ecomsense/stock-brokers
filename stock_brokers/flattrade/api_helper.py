@@ -1,4 +1,4 @@
-from stock_brokers.finvasia.NorenApi import NorenApi
+from stock_brokers.flattrade.NorenApi import NorenApi
 import time
 import concurrent.futures
 import pendulum
@@ -266,7 +266,6 @@ class ShoonyaApiPy(NorenApi):
         resp_ok = 0
         result = []
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-
             future_to_url = {
                 executor.submit(self.place_order, order): order for order in orders
             }
