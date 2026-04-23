@@ -151,14 +151,6 @@ def post_order_hook(*orderbook):
             "qty",
             "prc",
             "trantype",
-            "symbol",
-            "order_id",
-            "quantity",
-            "side",
-            "validity",
-            "price",
-            "trigger_price",
-            "average_price",
             "filled_quantity",
             "exchange",
             "exchange_order_id",
@@ -171,20 +163,20 @@ def post_order_hook(*orderbook):
         ]
         # Extract only the key-value pairs where the key is in the predefined keys list
         orderbook = [filter_dictionary_by_keys(order, keys) for order in orderbook]
-        # Rename broker fields to standard names
+        # Copy broker fields to standard names
         for order in orderbook:
-            if "tsym" in order and "symbol" not in order:
-                order["symbol"] = order.pop("tsym")
-            if "norenordno" in order and "order_id" not in order:
-                order["order_id"] = order.pop("norenordno")
-            if "qty" in order and "quantity" not in order:
-                order["quantity"] = order.pop("qty")
-            if "prc" in order and "price" not in order:
-                order["price"] = order.pop("prc")
-            if "trantype" in order and "side" not in order:
-                order["side"] = order.pop("trantype")
-            if "fillshares" in order and "filled_quantity" not in order:
-                order["filled_quantity"] = order.pop("fillshares")
+            if order.get("tsym"):
+                order["symbol"] = order.get("tsym")
+            if order.get("norenordno"):
+                order["order_id"] = order.get("norenordno")
+            if order.get("qty"):
+                order["quantity"] = order.get("qty")
+            if order.get("prc"):
+                order["price"] = order.get("prc")
+            if order.get("trantype"):
+                order["side"] = order.get("trantype")
+            if order.get("fillshares"):
+                order["filled_quantity"] = order.get("fillshares")
         float_cols = ["average_price", "price", "trigger_price"]
         int_cols = ["filled_quantity", "quantity"]
         order_list = []
