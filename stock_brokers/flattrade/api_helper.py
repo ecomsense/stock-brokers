@@ -174,11 +174,11 @@ def post_order_hook(*orderbook):
             for int_col in int_cols:
                 order[int_col] = (
                     lambda x: int(x) if isinstance(x, str) and x.isdigit() else 0
-                )(order.pop(int_col))
+                )(order.get(int_col, 0))
             for float_col in float_cols:
                 order[float_col] = (
-                    lambda x: float(x) if isinstance(x, str) and x.isdigit() else 0
-                )(order.pop(float_col))
+                    lambda x: float(x) if isinstance(x, str) and x.isdigit() else 0.0
+                )(order.get(float_col, 0.0))
 
             order = convert_time_string(
                 order, "exchange_timestamp", "DD-MM-YYYY HH:mm:ss"
