@@ -146,7 +146,13 @@ def post_trade_hook(*tradebook):
 def post_order_hook(*orderbook):
     try:
         keys = [
+            "tsym",
+            "norenordno",
+            "qty",
+            "prc",
+            "trantype",
             "symbol",
+            "order_id",
             "quantity",
             "side",
             "validity",
@@ -154,7 +160,6 @@ def post_order_hook(*orderbook):
             "trigger_price",
             "average_price",
             "filled_quantity",
-            "order_id",
             "exchange",
             "exchange_order_id",
             "disclosed_quantity",
@@ -166,6 +171,20 @@ def post_order_hook(*orderbook):
         ]
         # Extract only the key-value pairs where the key is in the predefined keys list
         orderbook = [filter_dictionary_by_keys(order, keys) for order in orderbook]
+        # Rename broker fields to standard names
+        for order in orderbook:
+            if "tsym" in order and "symbol" not in order:
+                order["symbol"] = order.pop("tsym")
+            if "norenordno" in order and "order_id" not in order:
+                order["order_id"] = order.pop("norenordno")
+            if "qty" in order and "quantity" not in order:
+                order["quantity"] = order.pop("qty")
+            if "prc" in order and "price" not in order:
+                order["price"] = order.pop("prc")
+            if "trantype" in order and "side" not in order:
+                order["side"] = order.pop("trantype")
+            if "fillshares" in order and "filled_quantity" not in order:
+                order["filled_quantity"] = order.pop("fillshares")
         float_cols = ["average_price", "price", "trigger_price"]
         int_cols = ["filled_quantity", "quantity"]
         order_list = []
